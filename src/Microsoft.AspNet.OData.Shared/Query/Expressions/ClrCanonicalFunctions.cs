@@ -8,6 +8,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.OData.Edm;
+using Microsoft.Spatial;
 
 namespace Microsoft.AspNet.OData.Query.Expressions
 {
@@ -43,6 +44,7 @@ namespace Microsoft.AspNet.OData.Query.Expressions
         internal const string DateFunctionName = "date";
         internal const string TimeFunctionName = "time";
         internal const string NowFunctionName = "now";
+        internal const string GeoDistanceFunctionName = "geo.distance";
 
         // string functions
         public static readonly MethodInfo StartsWith = MethodOf(_ => _defaultString.StartsWith(default(string)));
@@ -69,6 +71,9 @@ namespace Microsoft.AspNet.OData.Query.Expressions
 
         // enum functions
         public static readonly MethodInfo HasFlag = MethodOf(_ => _defaultEnum.HasFlag(default(Enum)));
+
+        // spatial functions
+        public static readonly MethodInfo DistanceOfGeography = MethodOf(_ => GeographyOperationsExtensions.Distance(default(Geography), default(Geography)));
 
         // Date properties
         public static readonly Dictionary<string, PropertyInfo> DateProperties = new[]

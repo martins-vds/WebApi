@@ -23,6 +23,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData;
 using Microsoft.OData.Edm;
 using Microsoft.OData.UriParser;
+using Microsoft.Spatial;
 
 namespace Microsoft.AspNet.OData.Query.Expressions
 {
@@ -1303,6 +1304,9 @@ namespace Microsoft.AspNet.OData.Query.Expressions
                 case ClrCanonicalFunctions.NowFunctionName:
                     return BindNow(node);
 
+                case ClrCanonicalFunctions.GeoDistanceFunctionName:
+                    return BindDistance(node);
+
                 default:
                     // Get Expression of custom binded method.
                     Expression expression = BindCustomMethodExpressionOrNull(node);
@@ -1908,6 +1912,17 @@ namespace Microsoft.AspNet.OData.Query.Expressions
             {
                 throw new ODataException(Error.Format(SRResources.FunctionNotSupportedOnEnum, functionName));
             }
+        }
+
+        private Expression BindDistance(SingleValueFunctionCallNode node)
+        {
+            Contract.Assert("geo.distance" == node.Name);
+
+            Expression[] arguments = BindArguments(node.Parameters);
+
+            Contract.Assert(arguments.Length == 2 && arguments.All(arg => typeof(Geography).IsAssignableFrom(arg.Type)));
+
+            return MakeFunctionCall(ClrCanonicalFunctions.DistanceOfGeography, arguments);
         }
 
         private Expression BindCustomMethodExpressionOrNull(SingleValueFunctionCallNode node)
